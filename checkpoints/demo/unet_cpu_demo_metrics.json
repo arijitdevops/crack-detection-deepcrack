@@ -1,0 +1,38 @@
+{
+  "checkpoint": "checkpoints/demo/unet_cpu_demo.pt",
+  "config": "configs/unet_cpu_demo.yaml",
+  "best_epoch": 15,
+  "training": "16 epochs from scratch, 255 train / 45 val images from train_img (seed 42), 256x256 input, batch 8, AdamW lr 1e-3 cosine, BCE+Dice, CPU with 1 thread, ~27 minutes",
+  "validation_at_best_epoch": {
+    "iou": 0.6596,
+    "dice": 0.7949,
+    "precision": 0.7497,
+    "recall": 0.8459
+  },
+  "test": {
+    "num_images": 237,
+    "evaluated_at": "256x256 network resolution (masks resized with nearest neighbour)",
+    "threshold_0.5": {
+      "iou": 0.7114,
+      "dice": 0.8314,
+      "precision": 0.8983,
+      "recall": 0.7737,
+      "pixel_accuracy": 0.9864
+    },
+    "best_f1_threshold": 0.15,
+    "at_best_f1_threshold": {
+      "iou": 0.7319,
+      "dice": 0.8452,
+      "precision": 0.8496,
+      "recall": 0.8408
+    },
+    "full_resolution_threshold_0.5": {
+      "iou": 0.6826,
+      "dice": 0.8114,
+      "precision": 0.8782,
+      "recall": 0.754,
+      "note": "src.predict.predict_array on the original 544x384 / 384x544 frames (network output upsampled), pixels pooled over all 237 test images"
+    }
+  },
+  "command": "python -m src.evaluate --config configs/unet_cpu_demo.yaml --checkpoint checkpoints/demo/unet_cpu_demo.pt"
+}

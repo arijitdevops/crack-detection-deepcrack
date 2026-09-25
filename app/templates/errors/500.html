@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Server error{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <div class="card border-danger">
+      <div class="card-body">
+        <h1 class="h4 card-title">Something went wrong</h1>
+        <p class="text-body-secondary">
+          Inference failed unexpectedly. The full traceback is in the server log.
+        </p>
+        <a class="btn btn-primary btn-sm" href="{{ url_for('main.index') }}">Back to upload</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

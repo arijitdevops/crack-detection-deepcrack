@@ -1,0 +1,77 @@
+# Baseline: U-Net trained from scratch on the DeepCrack dataset.
+experiment_name: unet_baseline
+
+data:
+  # Relative paths are resolved against the repository root.
+  data_dir: ../_datasets/deep_crack_dataset
+  train_images: train_img
+  train_masks: train_lab
+  test_images: test_img
+  test_masks: test_lab
+  image_suffix: .jpg
+  mask_suffix: .png
+  # Native DeepCrack frames are 544x384 (or 384x544 for portrait test frames).
+  image_size: [384, 384]   # [height, width] fed to the network
+  val_split: 0.15
+  num_workers: 4
+  pin_memory: true
+
+augment:
+  enabled: true
+  random_crop: true
+  crop_scale: [0.6, 1.0]
+  hflip_prob: 0.5
+  vflip_prob: 0.5
+  rot90_prob: 0.5
+  brightness: 0.2
+  contrast: 0.2
+
+model:
+  name: unet
+  in_channels: 3
+  num_classes: 1
+  base_channels: 32
+  depth: 4
+  bilinear: true
+  pretrained: false
+
+loss:
+  name: bce_dice
+  bce_weight: 0.5
+  dice_weight: 0.5
+  focal_gamma: 2.0
+  focal_alpha: 0.25
+  tversky_alpha: 0.3
+  tversky_beta: 0.7
+  pos_weight: null   # e.g. 5.0 to up-weight the sparse crack class in BCE
+
+train:
+  epochs: 40
+  batch_size: 8
+  lr: 0.0003
+  weight_decay: 0.0001
+  scheduler: cosine        # cosine | plateau | none
+  warmup_epochs: 1
+  min_lr: 0.000001
+  grad_clip: 1.0
+  amp: true
+  early_stopping_patience: 10
+  checkpoint_dir: checkpoints
+  log_dir: runs
+  save_every: 0            # 0 disables periodic epoch snapshots
+
+eval:
+  threshold: 0.5
+  threshold_sweep: [0.05, 0.95, 19]   # [start, stop, num] for the best-F1 search
+  batch_size: 8
+  reports_dir: reports
+  num_qualitative: 6
+
+inference:
+  tile_size: 384
+  tile_overlap: 0.25
+  sliding_window_min_size: 768   # images larger than this trigger tiled inference
+  pixel_size_mm: null            # set to mm/pixel to get crack length in mm
+
+seed: 42
+device: auto

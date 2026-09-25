@@ -1,0 +1,39 @@
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Environments
+.venv/
+venv/
+env/
+.env
+
+# Model artefacts and experiment output
+checkpoints/**/*.pt
+checkpoints/**/*.pth
+checkpoints/**/*.json
+!checkpoints/demo/unet_cpu_demo.pt
+!checkpoints/demo/unet_cpu_demo_metrics.json
+runs/*
+!runs/.gitkeep
+reports/*
+!reports/figures/
+reports/figures/*
+!reports/figures/.gitkeep
+
+# Flask upload scratch space
+uploads/
+
+# Datasets (kept outside the repo, see scripts/download_data.py)
+data/
+*.zip
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

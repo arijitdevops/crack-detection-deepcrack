@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block title %}Crack Detection &middot; Upload{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+
+    {% if not checkpoint_ready %}
+    <div class="alert alert-warning" role="alert">
+      <h2 class="h5 alert-heading">No trained model yet</h2>
+      <p class="mb-2">
+        The app could not find a checkpoint at
+        <code>{{ checkpoint_path }}</code>, so inference is disabled.
+      </p>
+      <p class="mb-2">Train one first:</p>
+      <pre class="mb-2 bg-body p-2 rounded border"><code>python -m src.train --config configs/unet.yaml</code></pre>
+      <p class="mb-0">
+        Then restart this server, or point <code>CHECKPOINT_PATH</code> at an existing
+        <code>.pt</code> file.
+      </p>
+    </div>
+    {% endif %}
+
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h1 class="h4 card-title">Analyse a surface photograph</h1>
+        <p class="text-body-secondary">
+          Upload a photograph of concrete, asphalt or masonry. The model returns a
+          per-pixel crack mask, the fraction of the image covered by cracks and an
+          indicative crack length.
+        </p>
+
+        <form action="{{ url_for('main.predict') }}" method="post" enctype="multipart/form-data">
+          <div class="mb-3">
+            <label for="image" class="form-label">Image file</label>
+            <input
+              class="form-control"
+              type="file"
+              id="image"
+              name="image"
+              accept=".jpg,.jpeg,.png,.bmp,.tif,.tiff"
+              required
+              {% if not checkpoint_ready %}disabled{% endif %}>
+            <div class="form-text">
+              Allowed: {{ allowed | join(', ') }}. Maximum {{ '%.0f' | format(max_upload_mb) }} MB.
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="threshold" class="form-label">
+              Decision threshold
+              <span class="badge text-bg-light" id="threshold-value">
+                {{ '%.2f' | format(default_threshold) }}
+              </span>
+            </label>
+            <input
+              type="range"
+              class="form-range"
+              min="0.05"
+              max="0.95"
+              step="0.05"
+              id="threshold"
+              name="threshold"
+              value="{{ default_threshold }}"
+              {% if not checkpoint_ready %}disabled{% endif %}>
+            <div class="form-text">
+              Lower values detect more crack pixels (higher recall); higher values are
+              stricter (higher precision).
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary" {% if not checkpoint_ready %}disabled{% endif %}>
+            Run detection
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <div class="card mt-4">
+      <div class="card-body">
+        <h2 class="h6 card-title">Programmatic access</h2>
+        <p class="small text-body-secondary mb-2">
+          The same model is available over HTTP:
+        </p>
+        <pre class="bg-body-tertiary p-2 rounded border small mb-0"><code>curl -F "image=@samples/11111.jpg" -F "threshold=0.5" \
+     http://127.0.0.1:5000/api/predict</code></pre>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  (function () {
+    var slider = document.getElementById('threshold');
+    var label = document.getElementById('threshold-value');
+    if (slider && label) {
+      slider.addEventListener('input', function () {
+        label.textContent = Number(slider.value).toFixed(2);
+      });
+    }
+  })();
+</script>
+{% endblock %}

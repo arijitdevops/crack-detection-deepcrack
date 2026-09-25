@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block title %}Crack Detection &middot; Result{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+  <div>
+    <h1 class="h4 mb-0">Detection result</h1>
+    <p class="text-body-secondary mb-0 small">
+      {{ filename }} &middot; {{ result.width }}&times;{{ result.height }} px
+      &middot; threshold {{ '%.2f' | format(result.threshold) }}
+    </p>
+  </div>
+  <div class="d-flex gap-2">
+    <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('main.index') }}">
+      Analyse another image
+    </a>
+    <a class="btn btn-primary btn-sm" href="{{ url_for('main.download', token=download_token) }}">
+      Download overlay
+    </a>
+  </div>
+</div>
+
+{% if not result.detected %}
+<div class="alert alert-info" role="alert">
+  No crack pixels were found at this threshold. Try lowering it below
+  {{ '%.2f' | format(result.threshold) }}.
+</div>
+{% endif %}
+
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <div class="card h-100">
+      <div class="card-header small fw-semibold">Original</div>
+      <img src="{{ original_uri }}" class="card-img-bottom result-image" alt="Uploaded image">
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card h-100">
+      <div class="card-header small fw-semibold">Predicted mask</div>
+      <img src="{{ mask_uri }}" class="card-img-bottom result-image" alt="Predicted crack mask">
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card h-100">
+      <div class="card-header small fw-semibold">Overlay</div>
+      <img src="{{ overlay_uri }}" class="card-img-bottom result-image" alt="Crack overlay">
+    </div>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-7">
+    <div class="card h-100">
+      <div class="card-header small fw-semibold">Measurements</div>
+      <div class="card-body">
+        <dl class="row mb-0 small">
+          <dt class="col-sm-6">Crack pixel ratio</dt>
+          <dd class="col-sm-6">{{ '%.4f' | format(result.crack_pixel_percent) }}%</dd>
+
+          <dt class="col-sm-6">Crack pixels</dt>
+          <dd class="col-sm-6">{{ '{:,}'.format(result.crack_pixels) }}</dd>
+
+          <dt class="col-sm-6">Estimated crack length</dt>
+          <dd class="col-sm-6">
+            {{ '%.0f' | format(result.estimated_crack_length_px) }} px
+            {% if result.estimated_crack_length_mm is defined %}
+              ({{ '%.0f' | format(result.estimated_crack_length_mm) }} mm)
+            {% endif %}
+          </dd>
+
+          <dt class="col-sm-6">Mean crack probability</dt>
+          <dd class="col-sm-6">{{ '%.4f' | format(result.mean_probability) }}</dd>
+
+          <dt class="col-sm-6">Peak crack probability</dt>
+          <dd class="col-sm-6">{{ '%.4f' | format(result.max_probability) }}</dd>
+        </dl>
+        <p class="text-body-secondary small mt-3 mb-0">
+          Length is estimated from the mask skeleton and is indicative only; convert it to
+          millimetres by setting <code>inference.pixel_size_mm</code> in the config.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="card h-100">
+      <div class="card-header small fw-semibold">Re-run with a different threshold</div>
+      <div class="card-body">
+        <p class="small text-body-secondary">
+          Re-upload the same file with a new threshold to trade recall against precision.
+        </p>
+        <form action="{{ url_for('main.predict') }}" method="post" enctype="multipart/form-data">
+          <div class="mb-3">
+            <label for="image" class="form-label small">Image file</label>
+            <input class="form-control form-control-sm" type="file" id="image" name="image"
+                   accept=".jpg,.jpeg,.png,.bmp,.tif,.tiff" required>
+          </div>
+          <div class="mb-3">
+            <label for="threshold" class="form-label small">
+              Threshold <span class="badge text-bg-light" id="threshold-value">{{ '%.2f' | format(result.threshold) }}</span>
+            </label>
+            <input type="range" class="form-range" min="0.05" max="0.95" step="0.05"
+                   id="threshold" name="threshold" value="{{ result.threshold }}">
+          </div>
+          <button type="submit" class="btn btn-outline-primary btn-sm">Re-run detection</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  (function () {
+    var slider = document.getElementById('threshold');
+    var label = document.getElementById('threshold-value');
+    if (slider && label) {
+      slider.addEventListener('input', function () {
+        label.textContent = Number(slider.value).toFixed(2);
+      });
+    }
+  })();
+</script>
+{% endblock %}

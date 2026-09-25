@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}File too large{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <div class="card border-warning">
+      <div class="card-body">
+        <h1 class="h4 card-title">That file is too large</h1>
+        <p class="text-body-secondary">{{ message }}</p>
+        <p class="small text-body-secondary">
+          Raise the limit with the <code>MAX_UPLOAD_MB</code> environment variable, or
+          downscale the photograph before uploading.
+        </p>
+        <a class="btn btn-primary btn-sm" href="{{ url_for('main.index') }}">Back to upload</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

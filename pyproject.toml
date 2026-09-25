@@ -1,0 +1,67 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "crack-detection-deepcrack"
+version = "0.1.0"
+description = "Binary crack segmentation on the DeepCrack dataset with U-Net models and a Flask inference UI."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
+authors = [{ name = "Sample Projects" }]
+keywords = ["segmentation", "u-net", "pytorch", "crack-detection", "deepcrack"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Image Recognition",
+]
+
+dependencies = [
+    "torch>=2.2,<3",
+    "torchvision>=0.17,<1",
+    "numpy>=1.24,<3",
+    "pillow>=10.0,<13",
+    "opencv-python-headless>=4.8,<6",
+    "pyyaml>=6.0,<7",
+    "python-dotenv>=1.0,<2",
+    "tqdm>=4.66,<5",
+    "tensorboard>=2.15,<3",
+    "matplotlib>=3.7,<4",
+    "flask>=3.0,<4",
+    "werkzeug>=3.0,<4",
+    "kagglehub>=0.3",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4,<10",
+    "ruff>=0.4,<1",
+    "black>=24.1,<27",
+]
+
+[project.scripts]
+crack-train = "src.train:main"
+crack-evaluate = "src.evaluate:main"
+crack-predict = "src.predict:main"
+
+[tool.setuptools]
+packages = ["src", "src.model", "app"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+filterwarnings = ["ignore::DeprecationWarning"]
+
+[tool.black]
+line-length = 100
+target-version = ["py310"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]

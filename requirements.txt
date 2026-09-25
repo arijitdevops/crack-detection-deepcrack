@@ -1,0 +1,27 @@
+# Core deep-learning stack
+torch>=2.2,<3
+torchvision>=0.17,<1
+
+# Data / imaging
+numpy>=1.24,<3
+pillow>=10.0,<13
+opencv-python-headless>=4.8,<6
+
+# Config, CLI and experiment tracking
+pyyaml>=6.0,<7
+python-dotenv>=1.0,<2
+tqdm>=4.66,<5
+tensorboard>=2.15,<3
+
+# Evaluation and figures
+matplotlib>=3.7,<4
+
+# Web application
+flask>=3.0,<4
+werkzeug>=3.0,<4
+
+# Dataset download (scripts/download_data.py)
+kagglehub>=0.3
+
+# Tests
+pytest>=7.4,<10

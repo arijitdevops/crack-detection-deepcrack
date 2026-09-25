@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Not found{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <div class="card">
+      <div class="card-body">
+        <h1 class="h4 card-title">Page not found</h1>
+        <p class="text-body-secondary">
+          The page you asked for does not exist. Downloads expire when the server restarts.
+        </p>
+        <a class="btn btn-primary btn-sm" href="{{ url_for('main.index') }}">Back to upload</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
